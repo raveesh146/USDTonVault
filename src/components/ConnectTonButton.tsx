@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Wallet } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import { getWalletService } from '@/lib/services';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -9,22 +8,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 
 export function ConnectTonButton() {
-  const { walletAddress, setWalletAddress, setUsdtBalance, demoMode } = useStore();
-  const walletService = getWalletService(demoMode);
+  const { walletAddress, setWalletAddress, setUsdtBalance } = useStore();
+  const [tonConnectUI] = useTonConnectUI();
+  const wallet = useTonWallet();
+
+  const syncFromHook = () => {
+    const addr = wallet?.account?.address;
+    if (addr) {
+      setWalletAddress(addr);
+      // TODO: real Jetton balance; placeholder for now
+      setUsdtBalance('0');
+    }
+  };
 
   const handleConnect = async () => {
     try {
-      const address = await walletService.connect();
-      setWalletAddress(address);
-      
-      const balance = await walletService.getJettonBalance('usdt');
-      setUsdtBalance(balance);
-      
-      toast.success('Wallet connected', {
-        description: `${address.slice(0, 8)}...${address.slice(-6)}`,
-      });
+      await tonConnectUI.openModal();
+      // Defer sync slightly to allow state to update
+      setTimeout(syncFromHook, 300);
+      if (wallet?.account?.address) {
+        const address = wallet.account.address;
+        toast.success('Wallet connected', {
+          description: `${address.slice(0, 8)}...${address.slice(-6)}`,
+        });
+      }
     } catch (error) {
       toast.error('Failed to connect wallet');
       console.error(error);
@@ -32,7 +42,7 @@ export function ConnectTonButton() {
   };
 
   const handleDisconnect = async () => {
-    await walletService.disconnect();
+    await tonConnectUI.disconnect();
     setWalletAddress(null);
     setUsdtBalance('0');
     toast.info('Wallet disconnected');

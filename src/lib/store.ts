@@ -12,6 +12,7 @@ interface AppState {
   // Demo mode
   demoMode: boolean;
   toggleDemoMode: () => void;
+  setDemoMode: (value: boolean) => void;
 
   // Vault data
   vaultStats: VaultStats | null;
@@ -37,7 +38,7 @@ export const useStore = create<AppState>()(
       // Initial state
       walletAddress: null,
       usdtBalance: '0',
-      demoMode: true,
+      demoMode: false,
       vaultStats: null,
       myPosition: null,
       events: [],
@@ -49,6 +50,7 @@ export const useStore = create<AppState>()(
       setWalletAddress: (address) => set({ walletAddress: address }),
       setUsdtBalance: (balance) => set({ usdtBalance: balance }),
       toggleDemoMode: () => set((state) => ({ demoMode: !state.demoMode })),
+      setDemoMode: (value: boolean) => set({ demoMode: value }),
       
       setVaultStats: (stats) => set({ vaultStats: stats }),
       setMyPosition: (position) => set({ myPosition: position }),

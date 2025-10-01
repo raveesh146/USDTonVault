@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ConnectTonButton } from '@/components/ConnectTonButton';
-import { Shield, Zap, Lock, TrendingUp } from 'lucide-react';
+import { Shield, Zap, Lock, TrendingUp, Users, Wallet, Percent } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/lib/store';
 
@@ -53,17 +53,18 @@ const Index = () => {
       <section className="container mx-auto px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Stablecoin in.
+            Follow elite traders.
             <br />
             <span className="bg-gradient-primary bg-clip-text text-transparent">
-              Stablecoin out.
+              Deposit USDT into their vault.
             </span>
             <br />
-            zk-verified profits.
+            zk-verified profits. 10% fee on profits only.
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Deposit USDT on TON into zkCopyVault. A leader executes trades.
-            zk proofs verify performance. You withdraw USDT.
+            Pick a leader trader and allocate USDT on TON to their vault. The leader
+            executes trades privately; zero-knowledge proofs verify realized PnL each epoch.
+            Profits are shared with a 10% performance fee — never on principal or losses.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <ConnectTonButton />
@@ -77,6 +78,77 @@ const Index = () => {
               </Button>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="max-w-5xl mx-auto">
+          <h3 className="text-2xl md:text-3xl font-semibold text-center mb-10">How it works</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-xl bg-gradient-card backdrop-blur-sm border border-border/50 shadow-card">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold mb-1">1) Select Leader</h4>
+              <p className="text-sm text-muted-foreground">Browse performance and risk stats. Choose a trader you trust.</p>
+            </div>
+            <div className="p-6 rounded-xl bg-gradient-card backdrop-blur-sm border border-border/50 shadow-card">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Wallet className="w-6 h-6 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold mb-1">2) Deposit USDT</h4>
+              <p className="text-sm text-muted-foreground">Send USDT to the leader’s vault and receive shares at current price.</p>
+            </div>
+            <div className="p-6 rounded-xl bg-gradient-card backdrop-blur-sm border border-border/50 shadow-card">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Percent className="w-6 h-6 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold mb-1">3) Earn, Fee on Profits</h4>
+              <p className="text-sm text-muted-foreground">PnL is zk-verified each epoch. 10% fee applies only to profits.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Leader previews */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl md:text-3xl font-semibold">Top leaders</h3>
+          <Button variant="outline" onClick={handleEnterApp} disabled={!walletAddress}>View all</Button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { name: 'AlphaTrader', pnl30d: '+18.4%', aum: '$420k', followers: '1,203' },
+            { name: 'GammaFlow', pnl30d: '+12.1%', aum: '$310k', followers: '876' },
+            { name: 'SigmaEdge', pnl30d: '+9.7%', aum: '$215k', followers: '654' },
+          ].map((l) => (
+            <button
+              key={l.name}
+              onClick={handleEnterApp}
+              className="text-left p-6 rounded-xl bg-gradient-card backdrop-blur-sm border border-border/50 shadow-card hover:shadow-glow transition-all"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-lg font-semibold">{l.name}</h4>
+                <span className="text-sm text-muted-foreground">30d</span>
+              </div>
+              <div className="text-2xl font-bold text-emerald-400">{l.pnl30d}</div>
+              <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground">AUM</p>
+                  <p className="font-medium">{l.aum}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Followers</p>
+                  <p className="font-medium">{l.followers}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Fee</p>
+                  <p className="font-medium">10%</p>
+                </div>
+              </div>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -119,6 +191,9 @@ const Index = () => {
               Enter App
             </Button>
           )}
+          <p className="text-xs text-muted-foreground mt-4">
+            Performance fee is 10% on profits only. No fees on principal or losses.
+          </p>
         </div>
       </section>
 

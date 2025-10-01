@@ -9,9 +9,10 @@ import { mockPricesService } from './mock/prices';
 // import { tonVaultService } from './ton/vault';
 // import { tonAdminService } from './ton/admin';
 // import { tonPricesService } from './ton/prices';
+import { tonWalletService } from './ton/wallet';
 
 export const getWalletService = (demoMode: boolean) => {
-  return demoMode ? mockWalletService : mockWalletService; // : tonWalletService
+  return demoMode ? mockWalletService : tonWalletService;
 };
 
 export const getVaultService = (demoMode: boolean) => {
