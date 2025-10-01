@@ -4,25 +4,30 @@ import { mockVaultService } from './mock/vault';
 import { mockAdminService } from './mock/admin';
 import { mockPricesService } from './mock/prices';
 
-// TODO: Import real TON services when ready
-// import { tonWalletService } from './ton/wallet';
-// import { tonVaultService } from './ton/vault';
-// import { tonAdminService } from './ton/admin';
-// import { tonPricesService } from './ton/prices';
+// Real TON services
 import { tonWalletService } from './ton/wallet';
+import { tonVaultService } from './ton/vault';
+import { tonAdminService } from './ton/admin';
+import { tonPricesService } from './ton/prices';
 
-export const getWalletService = (demoMode: boolean) => {
-  return demoMode ? mockWalletService : tonWalletService;
+// Type definitions for services
+export type WalletService = typeof mockWalletService;
+export type VaultService = typeof mockVaultService;
+export type AdminService = typeof mockAdminService;
+export type PricesService = typeof mockPricesService;
+
+export const getWalletService = (demoMode: boolean): WalletService => {
+  return demoMode ? mockWalletService : (tonWalletService as any);
 };
 
-export const getVaultService = (demoMode: boolean) => {
-  return demoMode ? mockVaultService : mockVaultService; // : tonVaultService
+export const getVaultService = (demoMode: boolean): VaultService => {
+  return demoMode ? mockVaultService : (tonVaultService as any);
 };
 
-export const getAdminService = (demoMode: boolean) => {
-  return demoMode ? mockAdminService : mockAdminService; // : tonAdminService
+export const getAdminService = (demoMode: boolean): AdminService => {
+  return demoMode ? mockAdminService : (tonAdminService as any);
 };
 
-export const getPricesService = (demoMode: boolean) => {
-  return demoMode ? mockPricesService : mockPricesService; // : tonPricesService
+export const getPricesService = (demoMode: boolean): PricesService => {
+  return demoMode ? mockPricesService : (tonPricesService as any);
 };

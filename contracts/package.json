@@ -23,6 +23,7 @@
         "@ton/tolk-js": ">=1.0.0",
         "@ton/ton": ">=15.3.1 <16.0.0",
         "@types/jest": "^30.0.0",
+        "@types/json-schema": "^7.0.15",
         "@types/node": "^22.17.2",
         "jest": "^30.0.5",
         "prettier": "^3.6.2",
