@@ -1,0 +1,138 @@
+;; Trade Event Logger Contract
+;; This contract logs all trades for proof of profits and historical tracking
+
+#include "imports/stdlib.fc"
+
+;; --- Operation Codes ---
+;; op_log_trade = 0x20
+;; op_update_performance = 0x21
+
+;; --- Error Codes ---
+;; error_unauthorized = 301
+
+;; --- Data Layout ---
+;; Storage: [ vault_address, trader_address, trade_count, total_volume, total_pnl, trades_dict ]
+
+;; Load storage
+(slice, slice, int, int, int, cell) load_data() inline_ref {
+    slice ds = get_data().begin_parse();
+    return (ds~load_msg_addr(), ds~load_msg_addr(), ds~load_uint(32), ds~load_coins(), ds~load_coins(), ds~load_dict());
+}
+
+() save_data(slice vault, slice trader, int trade_count, int total_volume, int total_pnl, cell trades) impure inline_ref {
+    set_data(begin_cell()
+        .store_slice(vault)
+        .store_slice(trader)
+        .store_uint(trade_count, 32)
+        .store_coins(total_volume)
+        .store_coins(total_pnl)
+        .store_dict(trades)
+        .end_cell());
+}
+
+;; --- Receive External Messages ---
+() recv_external(slice in_msg) impure {
+    accept_message();
+}
+
+;; --- Receive Internal Messages ---
+() recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) {
+        return ();
+    }
+
+    int op = in_msg_body~load_uint(32);
+    int query_id = in_msg_body~load_uint(64);
+
+    ;; Parse sender address
+    var cs = in_msg_full.begin_parse();
+    var flags = cs~load_uint(4);
+    slice sender_addr = cs~load_msg_addr();
+
+    ;; Load storage
+    var (vault, trader, trade_count, total_volume, total_pnl, trades) = load_data();
+
+    if (op == 0x20) { ;; op_log_trade
+        ;; Only vault or trader can log trades
+        throw_unless(301, 
+            equal_slices(sender_addr, vault) | equal_slices(sender_addr, trader));
+
+        ;; Parse trade details
+        int timestamp = in_msg_body~load_uint(32);
+        int trade_type = in_msg_body~load_uint(8); ;; 0=buy, 1=sell
+        int trade_amount = in_msg_body~load_coins();
+        slice token_addr = in_msg_body~load_msg_addr();
+        int pnl = in_msg_body~load_coins(); ;; Profit/Loss for this trade
+
+        ;; Store trade in dictionary
+        int trade_id = trade_count;
+        trades = trades.udict_set_builder(64, trade_id,
+            begin_cell()
+                .store_uint(timestamp, 32)
+                .store_uint(trade_type, 8)
+                .store_coins(trade_amount)
+                .store_slice(token_addr)
+                .store_coins(pnl)
+        );
+
+        trade_count += 1;
+        total_volume += trade_amount;
+        total_pnl += pnl;
+
+        save_data(vault, trader, trade_count, total_volume, total_pnl, trades);
+        return ();
+    }
+
+    if (op == 0x21) { ;; op_update_performance
+        ;; Only vault or trader can update performance
+        throw_unless(301, 
+            equal_slices(sender_addr, vault) | equal_slices(sender_addr, trader));
+
+        int new_pnl = in_msg_body~load_coins();
+        total_pnl = new_pnl;
+
+        save_data(vault, trader, trade_count, total_volume, total_pnl, trades);
+        return ();
+    }
+
+    ;; Unknown operation
+    throw(0xffff);
+}
+
+;; --- Getters ---
+(int, int, int) get_performance_stats() method_id {
+    var (vault, trader, trade_count, total_volume, total_pnl, trades) = load_data();
+    return (trade_count, total_volume, total_pnl);
+}
+
+(int, int, int, slice, int) get_trade_by_id(int trade_id) method_id {
+    var (vault, trader, trade_count, total_volume, total_pnl, trades) = load_data();
+    
+    var (trade_data, found) = trades.udict_get?(64, trade_id);
+    if (~ found) {
+        return (0, 0, 0, vault, 0); ;; Return empty if not found
+    }
+
+    var ts = trade_data~load_uint(32);
+    var trade_type = trade_data~load_uint(8);
+    var trade_amount = trade_data~load_coins();
+    var token_addr = trade_data~load_msg_addr();
+    var pnl = trade_data~load_coins();
+
+    return (ts, trade_type, trade_amount, token_addr, pnl);
+}
+
+int get_trade_count() method_id {
+    var (vault, trader, trade_count, total_volume, total_pnl, trades) = load_data();
+    return trade_count;
+}
+
+int get_total_pnl() method_id {
+    var (vault, trader, trade_count, total_volume, total_pnl, trades) = load_data();
+    return total_pnl;
+}
+
+(slice, slice) get_addresses() method_id {
+    var (vault, trader, trade_count, total_volume, total_pnl, trades) = load_data();
+    return (vault, trader);
+}

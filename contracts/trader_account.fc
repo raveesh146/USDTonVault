@@ -1,0 +1,141 @@
+;; Trader Account Contract
+;; This contract represents a trader's account that emits trade events
+;; The vault contract listens to these events to copy trades
+
+#include "imports/stdlib.fc"
+
+;; --- Operation Codes ---
+;; op_execute_trade = 0x10
+;; op_set_vault = 0x11
+;; op_withdraw_profit = 0x12
+
+;; --- Error Codes ---
+;; error_unauthorized = 201
+;; error_invalid_trade = 202
+
+;; --- Data Layout ---
+;; Storage: [ owner_address, vault_address, total_trades, profit_balance ]
+
+;; Load storage
+(slice, slice, int, int) load_data() inline_ref {
+    slice ds = get_data().begin_parse();
+    return (ds~load_msg_addr(), ds~load_msg_addr(), ds~load_uint(32), ds~load_coins());
+}
+
+() save_data(slice owner, slice vault, int total_trades, int profit_balance) impure inline_ref {
+    set_data(begin_cell()
+        .store_slice(owner)
+        .store_slice(vault)
+        .store_uint(total_trades, 32)
+        .store_coins(profit_balance)
+        .end_cell());
+}
+
+;; --- Receive External Messages ---
+() recv_external(slice in_msg) impure {
+    accept_message();
+}
+
+;; --- Receive Internal Messages ---
+() recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) {
+        return (); ;; Accept simple transfers
+    }
+
+    int op = in_msg_body~load_uint(32);
+    int query_id = in_msg_body~load_uint(64);
+
+    ;; Parse sender address
+    var cs = in_msg_full.begin_parse();
+    var flags = cs~load_uint(4);
+    slice sender_addr = cs~load_msg_addr();
+
+    ;; Load storage
+    var (owner, vault, total_trades, profit_balance) = load_data();
+
+    if (op == 0x10) { ;; op_execute_trade
+        ;; Only owner can execute trades
+        throw_unless(201, equal_slices(sender_addr, owner));
+
+        ;; Parse trade details
+        int trade_type = in_msg_body~load_uint(8); ;; 0=buy, 1=sell
+        int trade_amount = in_msg_body~load_coins();
+        slice token_addr = in_msg_body~load_msg_addr();
+
+        throw_if(202, trade_amount <= 0);
+
+        ;; Emit trade event to vault
+        if (~ cell_null?(vault)) {
+            var msg = begin_cell()
+                .store_uint(0x18, 6)
+                .store_slice(vault)
+                .store_coins(0)
+                .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+                .store_uint(0x03, 32) ;; op_mirror_trade
+                .store_uint(query_id, 64)
+                .store_uint(trade_type, 8)
+                .store_coins(trade_amount)
+                .store_slice(token_addr)
+                .end_cell();
+            send_raw_message(msg, 1);
+        }
+
+        total_trades += 1;
+        profit_balance += msg_value; ;; Track incoming profit
+
+        save_data(owner, vault, total_trades, profit_balance);
+        return ();
+    }
+
+    if (op == 0x11) { ;; op_set_vault
+        ;; Only owner can set vault address
+        throw_unless(201, equal_slices(sender_addr, owner));
+
+        slice new_vault = in_msg_body~load_msg_addr();
+        vault = new_vault;
+
+        save_data(owner, vault, total_trades, profit_balance);
+        return ();
+    }
+
+    if (op == 0x12) { ;; op_withdraw_profit
+        ;; Only owner can withdraw profit
+        throw_unless(201, equal_slices(sender_addr, owner));
+
+        int amount = in_msg_body~load_coins();
+        throw_if(202, amount > profit_balance);
+
+        ;; Send profit to owner
+        var msg = begin_cell()
+            .store_uint(0x18, 6)
+            .store_slice(owner)
+            .store_coins(amount)
+            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+            .end_cell();
+        send_raw_message(msg, 1);
+
+        profit_balance -= amount;
+
+        save_data(owner, vault, total_trades, profit_balance);
+        return ();
+    }
+
+    ;; Unknown operation
+    throw(0xffff);
+}
+
+;; --- Getters ---
+(slice, slice, int, int) get_trader_data() method_id {
+    var (owner, vault, total_trades, profit_balance) = load_data();
+    return (owner, vault, total_trades, profit_balance);
+}
+
+int get_total_trades() method_id {
+    var (owner, vault, total_trades, profit_balance) = load_data();
+    return total_trades;
+}
+
+int get_profit_balance() method_id {
+    var (owner, vault, total_trades, profit_balance) = load_data();
+    return profit_balance;
+}
