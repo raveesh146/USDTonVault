@@ -1,5 +1,7 @@
 {
-  "url": "http://localhost:5173",
+  "url": "http://localhost:8080",
   "name": "zkCopyVault",
-  "iconUrl": "http://localhost:5173/favicon.ico"
+  "iconUrl": "http://localhost:8080/icon-512.png",
+  "termsOfUseUrl": "http://localhost:8080/terms",
+  "privacyPolicyUrl": "http://localhost:8080/privacy"
 }

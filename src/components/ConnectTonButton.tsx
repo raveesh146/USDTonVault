@@ -52,13 +52,13 @@ export function ConnectTonButton() {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10 backdrop-blur-sm hover:border-white/40 transition-all duration-300">
             <Wallet className="w-4 h-4" />
             {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleDisconnect}>
+        <DropdownMenuContent align="end" className="bg-slate-800/90 backdrop-blur-sm border border-white/20">
+          <DropdownMenuItem onClick={handleDisconnect} className="text-white hover:bg-white/10">
             Disconnect
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -67,7 +67,10 @@ export function ConnectTonButton() {
   }
 
   return (
-    <Button onClick={handleConnect} className="gap-2 bg-gradient-primary hover:shadow-glow transition-all">
+    <Button 
+      onClick={handleConnect} 
+      className="gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
+    >
       <Wallet className="w-4 h-4" />
       Connect Wallet
     </Button>

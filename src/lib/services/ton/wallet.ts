@@ -8,7 +8,7 @@ class TonWalletService {
 
   constructor() {
     this.tonConnect = new TonConnect({
-      manifestUrl: 'https://ton-zk-vault.vercel.app/tonconnect-manifest.json',
+      manifestUrl: 'http://localhost:8080/tonconnect-manifest.json',
     });
   }
 
