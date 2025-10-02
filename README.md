@@ -1,9 +1,11 @@
 
-# 🔐 USDTonVault
+# USDTonVault
 
 ### Zero-Knowledge Proof-Verified Investment Vault on TON Blockchain
 
-## 🎯 Overview
+##  Overview
+
+![System Architecture](flow.png)
 
 USDTonVault is a decentralized asset management protocol on **TON** that lets followers deposit **stablecoins** into trader-led vaults.
 
@@ -34,9 +36,9 @@ This creates the **first trustless, privacy-preserving, and verifiable copy-trad
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-* **💵 Stablecoin-Denominated**: Users always deposit and withdraw in TON-stablecoins (e.g., USDT).
+* **Stablecoin-Denominated**: Users always deposit and withdraw in TON-stablecoins (e.g., USDT).
 * **Epoch-based accounting**: Trading performance measured in fixed cycles (epochs).
 * **Verifiable Performance** - zk-SNARK proofs verify PnL without revealing individual trades
 * **Isolated vaults per trader**: Each trader operates their own strategy vault with custom fee structures.
@@ -80,17 +82,17 @@ Our modern, intuitive interface provides:
    - Receive proportional vault shares
    - View updated portfolio balance
 
-3. **📊 Monitor Performance**
+3. **Monitor Performance**
    - Real-time PnL tracking
    - Historical trade data
    - Risk metrics dashboard
 
-4. **✅ Verify Proofs**
+4. ** Verify Proofs**
    - Automatic zk proof generation
    - On-chain verification status
    - Transparent audit trail
 
-5. **💸 Withdraw**
+5. **Withdraw**
    - Redeem shares for USDT + profits
    - Instant calculation of withdrawal amount
    - High-water mark fee display
