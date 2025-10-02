@@ -284,12 +284,19 @@ USDTonvault/
 - **Proof System**: circom + snarkjs (Groth16)
 - 
 ### Contract Addresses
-Trader.func: kQBascgtPO02miH-Xb9cNsb8LPZf9IwK-xQ-DhS1vjgqg0Uo
-[Trader.func]( https://testnet.tonscan.org/address/kQBascgtPO02miH-Xb9cNsb8LPZf9IwK-xQ-DhS1vjgqg0Uo)
-Vault.func:  EQDTcD9WeuhIJzaEpiPVacF-8Q7-GTWRrmeiLcjYhf7jrkXi
-[Vault.func](https://testnet.tonscan.org/address/kQDTcD9WeuhIJzaEpiPVacF-8Q7-GTWRrmeiLcjYhf7jrv5o)
-TradeLogger: kQAo4CLpCcpjaPpxEfGFJnBeCNjlP4NiS_geCYTO9HsaZ3x8
-[Tradelogger.func](https://testnet.tonscan.org/address/kQAo4CLpCcpjaPpxEfGFJnBeCNjlP4NiS_geCYTO9HsaZ3x8)
+
+- **Trader.func**  
+  `kQBascgtPO02miH-Xb9cNsb8LPZf9IwK-xQ-DhS1vjgqg0Uo`  
+  [View on Tonscan](https://testnet.tonscan.org/address/kQBascgtPO02miH-Xb9cNsb8LPZf9IwK-xQ-DhS1vjgqg0Uo)
+
+- **Vault.func**  
+  `EQDTcD9WeuhIJzaEpiPVacF-8Q7-GTWRrmeiLcjYhf7jrkXi`  
+  [View on Tonscan](https://testnet.tonscan.org/address/kQDTcD9WeuhIJzaEpiPVacF-8Q7-GTWRrmeiLcjYhf7jrv5o)
+
+- **TradeLogger.func**  
+  `kQAo4CLpCcpjaPpxEfGFJnBeCNjlP4NiS_geCYTO9HsaZ3x8`  
+  [View on Tonscan](https://testnet.tonscan.org/address/kQAo4CLpCcpjaPpxEfGFJnBeCNjlP4NiS_geCYTO9HsaZ3x8)
+
 
 ## 🤝 Contributing
 
